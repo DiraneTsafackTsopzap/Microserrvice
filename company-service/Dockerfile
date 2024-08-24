@@ -1,0 +1,18 @@
+# Spécifiez l'image de base OpenJDK
+FROM openjdk:22
+
+  # Définir une variable d'argument pour le fichier JAR
+ARG JAR_FILE=target/*.jar
+  
+  # Copier le fichier JAR dans l'image Docker
+  # Notez l'utilisation correcte de la syntaxe de substitution dans COPY
+COPY ${JAR_FILE} /microservice.jar
+
+  # Définir le point d'entrée pour l'image Docker
+ENTRYPOINT ["java", "-jar", "/microservice.jar"]
+  
+  # Exposer le port sur lequel l'application sera accessible
+EXPOSE 8080
+
+#docker build -t tsafacktsopzap/compagny_service .
+#docker run -d -p 8080:8080 --name Compagny_Container tsafacktsopzap/compagny_service

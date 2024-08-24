@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_compagny_container
+    environment:
+      POSTGRES_USER: dirane
+      POSTGRES_PASSWORD: dirane
+      POSTGRES_DB: compagny_database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres-network-dirane
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_compagny_container
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "8081:80"
+    depends_on:
+      - postgres
+    networks:
+      - postgres-network-dirane
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbit_compagny_container
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - postgres-network-dirane
+
+  springboot-app:
+    build: .
+    container_name: compagny_container
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/compagny_database
+      SPRING_DATASOURCE_USERNAME: dirane
+      SPRING_DATASOURCE_PASSWORD: dirane
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - postgres-network-dirane
+
+  eureka-server:
+    image: tsafacktsopzap/register_service:latest
+    container_name: eureka_server_container
+    ports:
+      - "8761:8761"
+    networks:
+      - postgres-network-dirane
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  postgres-network-dirane:
+    external: true

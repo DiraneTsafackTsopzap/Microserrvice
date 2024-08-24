@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres
+    hostname: postgreshostname
+    container_name: postgres_container_compagny
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: 'dirane'
+      POSTGRES_PASSWORD: 'dirane'
+      POSTGRES_DB: 'compagny_database'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    networks:
+      - postgres-network-dirane
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_container_compagny
+    ports:
+      - "5050:5050"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'diraneserges@gmail.com'
+      PGADMIN_DEFAULT_PASSWORD: 'test'
+      PGADMIN_LISTEN_PORT: '5050'
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin/
+    networks:
+      - postgres-network-dirane
+
+
+
+  rabbitmq:
+    image: rabbitmq
+    container_name: rabbitmq_container_compagny
+    ports:
+      - "5672:5672"
+    networks:
+      - postgres-network-dirane
+
+volumes:
+  postgres-data:
+  pgadmin-data:
+
+networks:
+  postgres-network-dirane:
+    external: true
